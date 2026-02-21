@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 const API_BASE = "https://datafa.st/api/v1/analytics";
-const API_KEY = process.env.DATAFAST_API_KEY!;
 
-async function datafastFetch(endpoint: string, params?: Record<string, string>) {
+async function resolveApiKey(): Promise<string> {
+  const jar = await cookies();
+  const custom = jar.get("datafast-api-key")?.value;
+  if (custom) return custom;
+  return process.env.DATAFAST_API_KEY!;
+}
+
+async function datafastFetch(
+  apiKey: string,
+  endpoint: string,
+  params?: Record<string, string>
+) {
   const url = new URL(`${API_BASE}/${endpoint}`);
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
   const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${API_KEY}` },
+    headers: { Authorization: `Bearer ${apiKey}` },
     next: { revalidate: 300 },
   });
   if (!res.ok) {
@@ -58,6 +69,7 @@ function lastWeekRange(tz: string) {
 }
 
 export async function GET() {
+  const apiKey = await resolveApiKey();
   const tz = "UTC";
   const allFields = "visitors,sessions,revenue,conversion_rate,name";
 
@@ -78,28 +90,28 @@ export async function GET() {
     devices,
     browsers,
   ] = await Promise.all([
-    datafastFetch("realtime"),
-    datafastFetch("timeseries", {
+    datafastFetch(apiKey, "realtime"),
+    datafastFetch(apiKey, "timeseries", {
       fields: allFields,
       interval: "hour",
       timezone: tz,
     }),
-    datafastFetch("timeseries", {
+    datafastFetch(apiKey, "timeseries", {
       fields: allFields,
       interval: "day",
       startAt: thirtyDaysAgo.toISOString().split("T")[0],
       endAt: now.toISOString().split("T")[0],
       timezone: tz,
     }),
-    datafastFetch("overview", todayRange(tz)),
-    datafastFetch("overview", yesterdayRange(tz)),
-    datafastFetch("overview", thisWeekRange(tz)),
-    datafastFetch("overview", lastWeekRange(tz)),
-    datafastFetch("countries", { limit: "5", timezone: tz }),
-    datafastFetch("referrers", { limit: "5", timezone: tz }),
-    datafastFetch("pages", { limit: "5", timezone: tz }),
-    datafastFetch("devices", { timezone: tz }),
-    datafastFetch("browsers", { limit: "5", timezone: tz }),
+    datafastFetch(apiKey, "overview", todayRange(tz)),
+    datafastFetch(apiKey, "overview", yesterdayRange(tz)),
+    datafastFetch(apiKey, "overview", thisWeekRange(tz)),
+    datafastFetch(apiKey, "overview", lastWeekRange(tz)),
+    datafastFetch(apiKey, "countries", { limit: "5", timezone: tz }),
+    datafastFetch(apiKey, "referrers", { limit: "5", timezone: tz }),
+    datafastFetch(apiKey, "pages", { limit: "5", timezone: tz }),
+    datafastFetch(apiKey, "devices", { timezone: tz }),
+    datafastFetch(apiKey, "browsers", { limit: "5", timezone: tz }),
   ]);
 
   return NextResponse.json({

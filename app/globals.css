@@ -32,3 +32,414 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================
+   HOMEPAGE — DataForecast Landing
+   ======================================== */
+
+.homepage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #040810;
+}
+
+.homepage-bg {
+  position: absolute;
+  inset: 0;
+  background: url("/weather-bg.png") center center / cover no-repeat;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.homepage-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      ellipse 80% 60% at 50% 40%,
+      transparent 0%,
+      rgba(4, 8, 16, 0.6) 70%,
+      rgba(4, 8, 16, 0.95) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(4, 8, 16, 0.3) 0%,
+      rgba(4, 8, 16, 0.1) 30%,
+      rgba(4, 8, 16, 0.5) 70%,
+      rgba(4, 8, 16, 0.98) 100%
+    );
+  z-index: 1;
+}
+
+/* Rain */
+.rain-container {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -10%;
+  width: 1px;
+  height: 18px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(79, 172, 254, 0.6)
+  );
+  animation: rain-fall linear infinite;
+}
+
+@keyframes rain-fall {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(110vh);
+  }
+}
+
+/* Lightning flash */
+.lightning {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(200, 220, 255, 0);
+  animation: lightning-flash 8s ease-in-out infinite;
+}
+
+@keyframes lightning-flash {
+  0%,
+  100% {
+    background: rgba(200, 220, 255, 0);
+  }
+  47% {
+    background: rgba(200, 220, 255, 0);
+  }
+  48% {
+    background: rgba(200, 220, 255, 0.08);
+  }
+  49% {
+    background: rgba(200, 220, 255, 0);
+  }
+  49.5% {
+    background: rgba(200, 220, 255, 0.12);
+  }
+  50.5% {
+    background: rgba(200, 220, 255, 0);
+  }
+}
+
+/* Content */
+.homepage-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 580px;
+  width: 100%;
+  padding: 3rem 1.5rem;
+}
+
+/* Header */
+.homepage-header {
+  margin-bottom: 2.5rem;
+}
+
+.radar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 172, 254, 0.25);
+  background: rgba(79, 172, 254, 0.06);
+  margin-bottom: 1.5rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: rgba(79, 172, 254, 0.9);
+  text-transform: uppercase;
+}
+
+.radar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4facfe;
+  box-shadow: 0 0 8px rgba(79, 172, 254, 0.8);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+
+.homepage-title {
+  font-family: var(--font-bebas), sans-serif;
+  font-size: clamp(4rem, 12vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  color: transparent;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #c8deff 40%,
+    #4facfe 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(79, 172, 254, 0.3))
+    drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+  margin: 0;
+  animation: title-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+  0% {
+    filter: drop-shadow(0 0 30px rgba(79, 172, 254, 0.2))
+      drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 50px rgba(79, 172, 254, 0.4))
+      drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+  }
+}
+
+.homepage-subtitle {
+  font-family: var(--font-crimson), Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Form */
+.homepage-form {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 3rem;
+}
+
+.homepage-input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  backdrop-filter: blur(12px);
+}
+
+.homepage-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.homepage-input:focus {
+  border-color: rgba(79, 172, 254, 0.5);
+  background: rgba(79, 172, 254, 0.06);
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.08);
+}
+
+.homepage-cta {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: #040810;
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 24px rgba(79, 172, 254, 0.25),
+    0 0 0 0 rgba(79, 172, 254, 0);
+}
+
+.homepage-cta:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 32px rgba(79, 172, 254, 0.35),
+    0 0 0 2px rgba(79, 172, 254, 0.15);
+}
+
+.homepage-cta:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.homepage-cta:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cta-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.homepage-cta:hover:not(:disabled) .cta-arrow {
+  transform: translateX(3px);
+}
+
+.homepage-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.divider-text {
+  font-family: var(--font-crimson), Georgia, serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.homepage-demo {
+  width: 100%;
+  padding: 13px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.homepage-demo:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Steps */
+.homepage-steps {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 3rem;
+}
+
+.steps-label {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(79, 172, 254, 0.25);
+  background: rgba(79, 172, 254, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  color: rgba(79, 172, 254, 0.8);
+  margin-top: 2px;
+}
+
+.step strong {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.step p {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.step a {
+  color: rgba(79, 172, 254, 0.7);
+  text-decoration: underline;
+  text-decoration-color: rgba(79, 172, 254, 0.3);
+  text-underline-offset: 2px;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.step a:hover {
+  color: #4facfe;
+  text-decoration-color: #4facfe;
+}
+
+/* Footer */
+.homepage-footer {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.homepage-footer a {
+  color: rgba(79, 172, 254, 0.5);
+  text-decoration: underline;
+  text-decoration-color: rgba(79, 172, 254, 0.2);
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.homepage-footer a:hover {
+  color: #4facfe;
+}

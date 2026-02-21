@@ -1,65 +1,186 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useCallback, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+
+function setCookie(name: string, value: string) {
+  document.cookie = `${name}=${encodeURIComponent(value)};path=/;max-age=86400;SameSite=Lax`;
+}
+
+function deleteCookie(name: string) {
+  document.cookie = `${name}=;path=/;max-age=0`;
+}
+
+const STORAGE_KEY = "datafast-api-key";
+const subscribe = () => () => {};
+const getSnapshot = () => sessionStorage.getItem(STORAGE_KEY) ?? "";
+const getServerSnapshot = () => "";
+
+export default function HomePage() {
+  const router = useRouter();
+  const storedKey = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [apiKey, setApiKey] = useState(storedKey);
+
+  const handleStart = useCallback(() => {
+    if (!apiKey.trim()) return;
+    sessionStorage.setItem("datafast-api-key", apiKey.trim());
+    setCookie("datafast-api-key", apiKey.trim());
+    router.push("/weather");
+  }, [apiKey, router]);
+
+  const handleDemo = useCallback(() => {
+    sessionStorage.removeItem("datafast-api-key");
+    deleteCookie("datafast-api-key");
+    router.push("/weather");
+  }, [router]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="homepage">
+      {/* Background layers */}
+      <div className="homepage-bg" />
+      <div className="homepage-overlay" />
+
+      {/* Rain effect */}
+      <RainEffect />
+
+      {/* Lightning flash */}
+      <div className="lightning" />
+
+      {/* Content */}
+      <div className="homepage-content">
+        <header className="homepage-header">
+          <div className="radar-badge">
+            <span className="radar-dot" />
+            <span className="radar-label">LIVE RADAR</span>
+            <span className="radar-dot" />
+          </div>
+
+          <h1 className="homepage-title">DATAFORECAST</h1>
+
+          <p className="homepage-subtitle">
+            Your website&rsquo;s analytics, delivered as a weather report.
+            <br />
+            Every metric tells a forecast.
           </p>
+        </header>
+
+        <div className="homepage-form">
+          <input
+            type="text"
+            className="homepage-input"
+            placeholder="Paste your DataFa.st API key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleStart()}
+            spellCheck={false}
+            autoComplete="off"
+          />
+
+          <button
+            className="homepage-cta"
+            onClick={handleStart}
+            disabled={!apiKey.trim()}
+          >
+            Check the forecast
+            <span className="cta-arrow">&rarr;</span>
+          </button>
+
+          <div className="homepage-divider">
+            <span className="divider-line" />
+            <span className="divider-text">or</span>
+            <span className="divider-line" />
+          </div>
+
+          <button className="homepage-demo" onClick={handleDemo}>
+            Try the demo
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+
+        <section className="homepage-steps">
+          <h2 className="steps-label">HOW IT WORKS</h2>
+
+          <div className="step">
+            <span className="step-number">1</span>
+            <div>
+              <strong>Get your API key</strong>
+              <p>
+                Go to your{" "}
+                <a
+                  href="https://datafa.st"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  DataFa.st dashboard
+                </a>
+                , website settings, then API tab.
+              </p>
+            </div>
+          </div>
+
+          <div className="step">
+            <span className="step-number">2</span>
+            <div>
+              <strong>Paste it above</strong>
+              <p>Enter your key and check the forecast.</p>
+            </div>
+          </div>
+
+          <div className="step">
+            <span className="step-number">3</span>
+            <div>
+              <strong>Read the weather</strong>
+              <p>
+                Every analytics metric becomes a weather pattern — visitors are
+                temperature, bounce rate is humidity, traffic trends are
+                forecasts.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <footer className="homepage-footer">
+          powered by{" "}
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://datafa.st"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            DataFa.st
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function seededRandom(seed: number) {
+  const x = Math.sin(seed + 1) * 10000;
+  return x - Math.floor(x);
+}
+
+const RAIN_DROPS = Array.from({ length: 60 }, (_, i) => ({
+  id: i,
+  left: seededRandom(i * 4) * 100,
+  delay: seededRandom(i * 4 + 1) * 2,
+  duration: 0.6 + seededRandom(i * 4 + 2) * 0.4,
+  opacity: 0.15 + seededRandom(i * 4 + 3) * 0.25,
+}));
+
+function RainEffect() {
+  return (
+    <div className="rain-container" aria-hidden="true">
+      {RAIN_DROPS.map((drop) => (
+        <div
+          key={drop.id}
+          className="rain-drop"
+          style={{
+            left: `${drop.left}%`,
+            animationDelay: `${drop.delay}s`,
+            animationDuration: `${drop.duration}s`,
+            opacity: drop.opacity,
+          }}
+        />
+      ))}
     </div>
   );
 }
